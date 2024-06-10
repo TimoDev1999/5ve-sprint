@@ -145,8 +145,10 @@ type Walking struct {
 func (w Walking) Calories() float64 {
 	// вставьте ваш код ниже
 	speedInSec := w.meanSpeed() * KmHInMsec
-	speedInSecSquared := speedInSec * speedInSec
-	return ((CaloriesWeightMultiplier*w.Weight + (speedInSecSquared/w.Height)*CaloriesSpeedHeightMultiplier*w.Weight) * w.Duration.Hours() * MinInHours)
+	height := w.Height / 100
+	trainingiInMin := w.Duration.Hours() * MinInHours
+	weightForFormula := CaloriesWeightMultiplier * w.Weight
+	return (weightForFormula + (speedInSec*speedInSec/height)*CaloriesSpeedHeightMultiplier*w.Weight) * trainingiInMin
 }
 
 // TrainingInfo возвращает структуру InfoMessage с информацией о проведенной тренировке.
@@ -197,7 +199,7 @@ func (s Swimming) meanSpeed() float64 {
 func (s Swimming) Calories() float64 {
 	// вставьте ваш код ниже
 	speed := s.meanSpeed()
-	return ((speed + SwimmingCaloriesMeanSpeedShift) * s.Weight * SwimmingCaloriesWeightMultiplier * s.Duration.Hours() * MinInHours)
+	return (speed + SwimmingCaloriesMeanSpeedShift) * s.Weight * SwimmingCaloriesWeightMultiplier * s.Duration.Hours()
 }
 
 // TrainingInfo returns info about swimming training.
@@ -207,7 +209,7 @@ func (s Swimming) TrainingInfo() InfoMessage {
 	return InfoMessage{
 		TrainingType: s.TrainingType,
 		Duration:     s.Duration,
-		Distance:     s.LengthPool * s.CountPool / MInKm,
+		Distance:     s.distance(),
 		Speed:        s.meanSpeed(),
 		Calories:     s.Calories(),
 	}
